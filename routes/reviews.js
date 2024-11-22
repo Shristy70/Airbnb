@@ -5,6 +5,7 @@ const ExpressError = require("../utils/ExpressError.js");
 const { reviewSchema } = require("../schema.js");
 const Review = require("../models/review.js");
 const Listing = require("../models/listing.js");
+
 const validReviews = (req, res, next) => {
   let { error } = reviewSchema.validate(req.body);
   if (error) {
@@ -27,6 +28,7 @@ route.post(
     listing.reviews.push(newReviews);
     await newReviews.save();
     await listing.save();
+    req.flash("success", "new review created");
     res.redirect(`/listings/${listing._id}`);
   })
 );
@@ -38,6 +40,7 @@ route.delete(
 
     await Listing.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
     await Review.findByIdAndDelete(reviewId);
+    req.flash("success", "review deleted");
     res.redirect(`/listings/${id}`);
   })
 );
